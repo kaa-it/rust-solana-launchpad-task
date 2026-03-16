@@ -6,8 +6,8 @@ resolution = true
 skip-lint = false
 
 [programs.devnet]
-sol_usd_oracle = "4cuvLFFqhaKnTHfeq2FtTUvgudRSe7wq982fA9PBUqBU"
-token_minter = "E5erGzaxgCwHqH7RjLXLGWziXj8CXpyN7zW6BRodfFnE"
+sol_usd_oracle = "G5xecfGVLnwY7kx62NUjSEKrPNfCBxvoJe1UEJaY4Cn9"
+token_minter = "5FrKpGN3iQSPVH6rPLoNZCjeJntQyujkXrk2JbQk9hte"
 
 [programs.localnet]
 sol_usd_oracle = "G5xecfGVLnwY7kx62NUjSEKrPNfCBxvoJe1UEJaY4Cn9"
