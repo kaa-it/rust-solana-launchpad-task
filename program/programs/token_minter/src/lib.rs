@@ -12,6 +12,7 @@ use sol_usd_oracle::{state::OracleState, PRICE_DECIMALS};
 
 pub const USD_DECIMALS: u8 = 6;
 pub const LAMPORTS_PER_SOL_U64: u64 = 1_000_000_000;
+pub const MAX_STALENESS_SLOTS: u64 = 100;
 
 declare_id!("5FrKpGN3iQSPVH6rPLoNZCjeJntQyujkXrk2JbQk9hte");
 
@@ -68,6 +69,13 @@ pub mod token_minter {
         require!(
             oracle_state.decimals == PRICE_DECIMALS,
             MinterError::OracleDecimalsMismatch
+        );
+
+        let clock = Clock::get()?;
+        let slots_ago = clock.slot.saturating_sub(oracle_state.last_updated_slot);
+        require!(
+            slots_ago <= MAX_STALENESS_SLOTS,
+            MinterError::StaleData
         );
 
         let fee_lamports = compute_fee_lamports(ctx.accounts.config.mint_fee_usd, oracle_state.price)?;
@@ -165,11 +173,6 @@ pub mod token_minter {
 
 fn compute_fee_lamports(mint_fee_usd: u64, price: u64) -> Result<u64> {
     require!(price > 0, MinterError::OraclePriceZero);
-
-    // TODO(student): convert the USD-denominated mint fee into lamports.
-    // Both `mint_fee_usd` and `price` use 6 decimal places, so the formula is:
-    // fee_lamports = mint_fee_usd * LAMPORTS_PER_SOL / price
-    // Keep the integer math and overflow protection from the production version.
     
     let fee = mint_fee_usd as u128;
     let price_u128 = price as u128;
@@ -320,4 +323,6 @@ pub enum MinterError {
     InvalidMetadataPda,
     #[msg("Metaplex create metadata CPI failed")]
     MetadataCpiFailed,
+    #[msg("Oracle data is too stale")]
+    StaleData
 }
